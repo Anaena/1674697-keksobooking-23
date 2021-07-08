@@ -1,5 +1,5 @@
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
-
+const mapCanvas = document.querySelector('#map-canvas');
 const setCardElement = (cardElement, className, value) => {
   const element = cardElement.querySelector(className);
   if (!value) {
@@ -52,22 +52,27 @@ const getImages = (cardElement, photos) => {
   }
 };
 
-const renderCards = (card) => {
-  const cardElement = cardTemplate.cloneNode(true);
-  const offer = card.offer;
-  setCardElement(cardElement, '.popup__title', offer.title);
-  setCardElement(cardElement, '.popup__text--address', offer.address);
-  setCardElement(cardElement, '.popup__text--price', `${offer.price} ₽/ночь`);
-  setCardElement(cardElement, '.popup__type', getCardType(offer.type));
-  setCardElement(cardElement, '.popup__text--capacity', `${offer.rooms} комнаты для ${offer.guests} гостей`);
-  setCardElement(cardElement, '.popup__text--time', `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`);
-  setCardElement(cardElement, '.popup__features', getFeatures(offer.type));
-  getFeatures(cardElement, offer.features);
-  setCardElement(cardElement, '.popup__description', offer.description);
-  getImages(cardElement, offer.photos);
-  cardElement.querySelector('.popup__avatar').src = card.author.avatar;
+const renderCards = (cards) => {
+  const cardFragment = document.createDocumentFragment();
+  cards.forEach((card) => {
+    const cardElement = cardTemplate.cloneNode(true);
+    const offer = card.offer;
+    setCardElement(cardElement, '.popup__title', offer.title);
+    setCardElement(cardElement, '.popup__text--address', offer.address);
+    setCardElement(cardElement, '.popup__text--price', `${offer.price} ₽/ночь`);
+    setCardElement(cardElement, '.popup__type', getCardType(offer.type));
+    setCardElement(cardElement, '.popup__text--capacity', `${offer.rooms} комнаты для ${offer.guests} гостей`);
+    setCardElement(cardElement, '.popup__text--time', `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`);
+    getFeatures(cardElement, offer.features);
+    setCardElement(cardElement, '.popup__description', offer.description);
+    getImages(cardElement, offer.photos);
+    cardElement.querySelector('.popup__avatar').src = card.author.avatar;
 
-  return cardElement;
+    // return cardElement;
+    cardFragment.appendChild(cardElement);
+  });
+
+  mapCanvas.appendChild(cardFragment);
 };
 
 export { renderCards };
