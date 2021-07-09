@@ -16,8 +16,10 @@ const price = adForm.querySelector('#price');
 const type = adForm.querySelector('#type');
 const roomNumber = adForm.querySelector('#room_number');
 const capasity = adForm.querySelector('#capacity');
+const timeIn = adForm.querySelector('#timein');
+const timeOut = adForm.querySelector('#timeout');
 
-const checkTitleValidity = () => {
+const onTitleValidityCheck = () => {
   const titleLength = title.value.length;
 
   if (titleLength < MIN_TITLE_LENGTH) {
@@ -34,9 +36,9 @@ const checkTitleValidity = () => {
   title.reportValidity();
 };
 
-title.addEventListener('input', checkTitleValidity);
+title.addEventListener('input', onTitleValidityCheck);
 
-const checkPriceValidity = () => {
+const onPriceValidityCheck = () => {
   if (price.value > MAX_PRICE) {
     price.setCustomValidity(`Цена не должна превышать ${MAX_PRICE} руб.`);
     price.style.outline = '3px solid #e90000';
@@ -52,10 +54,10 @@ const checkPriceValidity = () => {
   price.reportValidity();
 };
 
-type.addEventListener('change', checkPriceValidity);
-price.addEventListener('input', checkPriceValidity);
+type.addEventListener('change', onPriceValidityCheck);
+price.addEventListener('input', onPriceValidityCheck);
 
-const checkRoomValidity = () => {
+const onRoomValidityCheck = () => {
   const guests = capasity.value;
   const rooms = roomNumber.value;
   if (rooms === '100' && guests !== '0') {
@@ -72,5 +74,16 @@ const checkRoomValidity = () => {
   capasity.reportValidity();
 };
 
-roomNumber.addEventListener('change', checkRoomValidity);
-capasity.addEventListener('change', checkRoomValidity);
+roomNumber.addEventListener('change', onRoomValidityCheck);
+capasity.addEventListener('change', onRoomValidityCheck);
+
+const onTimeInChange = () => {
+  timeOut.value = timeIn.value;
+};
+
+const onTimeOutChange = () => {
+  timeIn.value = timeOut.value;
+};
+
+timeIn.addEventListener('change', onTimeInChange);
+timeOut.addEventListener('change', onTimeOutChange);
