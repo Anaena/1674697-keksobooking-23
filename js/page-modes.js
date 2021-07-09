@@ -25,4 +25,4 @@ const activatePage = () => {
   }
 };
 
-export { deactivatePage, activatePage };
+export { deactivatePage, activatePage, adForm, mapFilters };
