@@ -18,6 +18,7 @@ const roomNumber = adForm.querySelector('#room_number');
 const capasity = adForm.querySelector('#capacity');
 const timeIn = adForm.querySelector('#timein');
 const timeOut = adForm.querySelector('#timeout');
+const address = adForm.querySelector('#address');
 
 const onTitleValidityCheck = () => {
   const titleLength = title.value.length;
@@ -87,3 +88,5 @@ const onTimeOutChange = () => {
 
 timeIn.addEventListener('change', onTimeInChange);
 timeOut.addEventListener('change', onTimeOutChange);
+
+export { address };
