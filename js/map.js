@@ -4,6 +4,7 @@ import { renderCards } from './card-popup.js';
 
 const TOKIO_LAT = 35.6817;
 const TOKIO_LNG = 139.75388;
+const ADVERTS_NUMBER = 10;
 
 const map = L.map('map-canvas');
 
@@ -41,21 +42,22 @@ const pinIcon = L.icon({
   iconAnchor: [20, 40],
 });
 
-const advertGroup = L.layerGroup().addTo(map);
+let advertGroup;
 
 const addAdvertMarkers = (adverts) => {
-  adverts.forEach((advert) => {
+  advertGroup = L.layerGroup().addTo(map);
+  adverts.forEach((element, index) => {
     L.marker(
       {
-        lat: advert.location.lat,
-        lng: advert.location.lng,
+        lat: element.location.lat,
+        lng: element.location.lng,
       },
       {
         icon: pinIcon,
       },
     ).addTo(advertGroup)
       .bindPopup(
-        renderCards(advert),
+        renderCards(adverts[index]),
         {
           keepInView: true,
         },
@@ -86,6 +88,12 @@ const initMap = () => {
   ).addTo(map);
 };
 
+let allAdverts;
+
+const saveData = (loadedData) => {
+  allAdverts = loadedData;
+};
+
 const resetMap = () => {
   mainMarker.setLatLng({
     lat: TOKIO_LAT,
@@ -98,6 +106,8 @@ const resetMap = () => {
   }, 13);
 
   startAddressValue();
+  advertGroup.remove();
+  addAdvertMarkers(allAdverts.slice(0, ADVERTS_NUMBER));
 };
 
-export { initMap, resetMap, addAdvertMarkers};
+export { initMap, resetMap, saveData, addAdvertMarkers, ADVERTS_NUMBER, startAddressValue };

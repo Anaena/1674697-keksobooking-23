@@ -1,4 +1,7 @@
 import { adForm } from './page-modes.js';
+import { sendData } from './api.js';
+import { resetMap, startAddressValue } from './map.js';
+import { showErrorMessage, showSuccessMessage } from './modal-messages.js';
 
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
@@ -19,6 +22,9 @@ const capasity = adForm.querySelector('#capacity');
 const timeIn = adForm.querySelector('#timein');
 const timeOut = adForm.querySelector('#timeout');
 const address = adForm.querySelector('#address');
+const invalidInputs = adForm.querySelectorAll('input:invalid');
+const photoBox = adForm.querySelector('.ad-form__photo');
+const resetButton = adForm.querySelector('.ad-form__reset');
 
 const onTitleValidityCheck = () => {
   const titleLength = title.value.length;
@@ -63,14 +69,24 @@ const onRoomValidityCheck = () => {
   const rooms = roomNumber.value;
   if (rooms === '100' && guests !== '0') {
     capasity.setCustomValidity('Только не для гостей');
+    capasity.style.outline = '3px solid #e90000';
+    roomNumber.style.outline = '3px solid #e90000';
   } else if (rooms === '3' && guests === '0') {
     capasity.setCustomValidity('Вариант для 3, 2 или 1 гостя');
+    capasity.style.outline = '3px solid #e90000';
+    roomNumber.style.outline = '3px solid #e90000';
   } else if (rooms === '1' && guests !== '1') {
     capasity.setCustomValidity('Только для 1 гостя');
+    capasity.style.outline = '3px solid #e90000';
+    roomNumber.style.outline = '3px solid #e90000';
   } else if (rooms === '2' && guests === '0' || rooms === '2' && guests === '3') {
     capasity.setCustomValidity('Для 1 или 2 гостей');
+    capasity.style.outline = '3px solid #e90000';
+    roomNumber.style.outline = '3px solid #e90000';
   } else {
     capasity.setCustomValidity('');
+    capasity.style.outline = 'none';
+    roomNumber.style.outline = 'none';
   }
   capasity.reportValidity();
 };
@@ -89,4 +105,38 @@ const onTimeOutChange = () => {
 timeIn.addEventListener('change', onTimeInChange);
 timeOut.addEventListener('change', onTimeOutChange);
 
-export { address };
+const setUserFormSubmit = () => {
+  adForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    sendData(
+      showSuccessMessage,
+      showErrorMessage,
+      new FormData(evt.target),
+    );
+  });
+};
+
+const resetForm = () => {
+  adForm.reset();
+  startAddressValue();
+  price.placeholder = MIN_PRICE[type.value];
+  photoBox.hidden = false;
+
+  invalidInputs.forEach((input) => {
+    input.style.outline = 'none';
+  });
+
+  const previewPhotos = adForm.querySelectorAll('.photo-preview__photo');
+  previewPhotos.forEach((photo) => {
+    photo.remove();
+  });
+};
+
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  resetMap();
+  resetForm();
+});
+
+export { address, setUserFormSubmit, resetForm };

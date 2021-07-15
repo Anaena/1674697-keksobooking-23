@@ -1,5 +1,7 @@
 const ALERT_SHOW_TIME = 5000;
 
+const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
 // Функция взята из интернета и доработана
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 
@@ -72,4 +74,4 @@ const shuffle = (pictures) => {
   return pictures;
 };
 
-export { getRandomPositiveInteger, getRandomPositiveFloat, showAlert, debounce, shuffle };
+export { getRandomPositiveInteger, getRandomPositiveFloat, showAlert, debounce, shuffle, isEscEvent };
