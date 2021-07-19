@@ -1,9 +1,8 @@
-import { activatePage } from './page-modes.js';
+
 import { address } from './form.js';
 import { renderCards } from './card-popup.js';
 
-const TOKIO_LAT = 35.6817;
-const TOKIO_LNG = 139.75388;
+const DEFAULT_POSITION = { lat: 35.6794, lng: 139.72864 };
 const ADVERTS_NUMBER = 10;
 
 const map = L.map('map-canvas');
@@ -14,10 +13,16 @@ const mainPinIcon = L.icon({
   iconAnchor: [26, 52],
 });
 
+const pinIcon = L.icon({
+  iconUrl: './img/pin.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
+
 const mainMarker = L.marker(
   {
-    lat: TOKIO_LAT,
-    lng: TOKIO_LNG,
+    lat: DEFAULT_POSITION.lat,
+    lng: DEFAULT_POSITION.lng,
   },
   {
     draggable: true,
@@ -25,39 +30,38 @@ const mainMarker = L.marker(
   },
 );
 
+const addAddress = (markerName) => {
+  const pinPosition = markerName.getLatLng();
+  address.value = `${(pinPosition.lat).toFixed(5)}, ${(pinPosition.lng).toFixed(5)}`;
+};
+
+const startAddressValue = () => {
+  address.value = `${DEFAULT_POSITION.lat}`, `${DEFAULT_POSITION.lng}`;
+};
+
 const addMainMarker = () => {
   mainMarker.addTo(map);
 
   mainMarker.on('moveend', (evt) => {
-    const currentCoordinates = evt.target.getLatLng();
-    const currentLat = currentCoordinates.lat.toFixed(5);
-    const currentLng = currentCoordinates.lng.toFixed(5);
-    address.value = `${currentLat}, ${currentLng}`;
+    addAddress(evt.target);
   });
 };
 
-const pinIcon = L.icon({
-  iconUrl: './img/pin.svg',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
-
-let advertGroup;
+const advertGroup = L.layerGroup().addTo(map);
 
 const addAdvertMarkers = (adverts) => {
-  advertGroup = L.layerGroup().addTo(map);
-  adverts.forEach((element, index) => {
+  adverts.forEach((advert) => {
     L.marker(
       {
-        lat: element.location.lat,
-        lng: element.location.lng,
+        lat: advert.location.lat,
+        lng: advert.location.lng,
       },
       {
         icon: pinIcon,
       },
     ).addTo(advertGroup)
       .bindPopup(
-        renderCards(adverts[index]),
+        renderCards(advert),
         {
           keepInView: true,
         },
@@ -65,19 +69,14 @@ const addAdvertMarkers = (adverts) => {
   });
 };
 
-const startAddressValue = () => {
-  address.value = `${TOKIO_LAT}, ${TOKIO_LNG}`;
-};
-
-const initMap = () => {
+const initMap = (cb) => {
   map.on('load', () => {
-    activatePage();
-    addMainMarker();
+    cb();
   });
 
   map.setView({
-    lat: TOKIO_LAT,
-    lng: TOKIO_LNG,
+    lat: DEFAULT_POSITION.lat,
+    lng: DEFAULT_POSITION.lng,
   }, 13);
 
   L.tileLayer(
@@ -86,28 +85,34 @@ const initMap = () => {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
   ).addTo(map);
+  addMainMarker();
 };
 
-let allAdverts;
+const showAdvertMarkers = (adverts) => {
+  advertGroup.remove();
+  adverts.slice(0, ADVERTS_NUMBER).forEach((advert) =>  addAdvertMarkers(advert).addTo(advertGroup));
+};
 
-const saveData = (loadedData) => {
-  allAdverts = loadedData;
+let receiveAdvert;
+
+const onAdvertReceive = (adverts) => {
+  receiveAdvert = adverts.slice();
+  showAdvertMarkers(receiveAdvert);
 };
 
 const resetMap = () => {
   mainMarker.setLatLng({
-    lat: TOKIO_LAT,
-    lng: TOKIO_LNG,
+    lat: DEFAULT_POSITION.lat,
+    lng: DEFAULT_POSITION.lng,
   });
 
   map.setView({
-    lat: TOKIO_LAT,
-    lng: TOKIO_LNG,
+    lat: DEFAULT_POSITION.lat,
+    lng: DEFAULT_POSITION.lng,
   }, 13);
 
   startAddressValue();
-  advertGroup.remove();
-  addAdvertMarkers(allAdverts.slice(0, ADVERTS_NUMBER));
+  showAdvertMarkers(receiveAdvert);
 };
 
-export { initMap, resetMap, saveData, addAdvertMarkers, ADVERTS_NUMBER, startAddressValue };
+export { initMap, resetMap, showAdvertMarkers, onAdvertReceive, addAdvertMarkers, ADVERTS_NUMBER, startAddressValue };

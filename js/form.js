@@ -139,4 +139,4 @@ resetButton.addEventListener('click', (evt) => {
   resetForm();
 });
 
-export { address, setUserFormSubmit, resetForm };
+export { address, setUserFormSubmit, resetForm, adForm };

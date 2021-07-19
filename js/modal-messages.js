@@ -1,4 +1,4 @@
-import { isEscEvent } from './utils.js';
+import { onMessageKeydown } from './close-keydown.js';
 import { resetForm } from './form.js';
 import { resetMap } from './map.js';
 
@@ -10,44 +10,30 @@ const errorButton = errorMessage.querySelector('.error__button');
 
 const onSuccessRemove = () => {
   successMessage.remove();
+  resetForm();
+  resetMap();
   document.removeEventListener('click', onSuccessRemove);
+  document.removeEventListener('keydown', onMessageKeydown);
 };
 
 const onErrorRemove = () => {
   errorMessage.remove();
   document.removeEventListener('click', onErrorRemove);
   errorButton.removeEventListener('click', onErrorRemove);
-
-};
-
-const onElementEscRemove = () => {
-  if (isEscEvent) {
-    onSuccessRemove();
-    document.removeEventListener('keydown', onElementEscRemove);
-  }
-};
-
-const onErrorEscRemove = () => {
-  if (isEscEvent) {
-    onErrorRemove();
-    document.removeEventListener('keydown', onErrorEscRemove);
-  }
+  document.removeEventListener('keydown', onMessageKeydown);
 };
 
 const showSuccessMessage = () => {
-  document.addEventListener('keydown', onElementEscRemove);
+  document.addEventListener('keydown', onMessageKeydown);
   document.addEventListener('click', onSuccessRemove);
-  resetForm();
-  resetMap();
   document.body.appendChild(successMessage);
 };
 
 const showErrorMessage = () => {
-  document.addEventListener('keydown', onErrorEscRemove);
+  document.addEventListener('keydown', onMessageKeydown);
   document.addEventListener('click', onErrorRemove);
   errorButton.addEventListener('click', onErrorRemove);
-
   document.body.appendChild(errorMessage);
 };
 
-export { showSuccessMessage, showErrorMessage };
+export { onErrorRemove, onSuccessRemove, showSuccessMessage, showErrorMessage };
